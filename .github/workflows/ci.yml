@@ -20,6 +20,14 @@ jobs:
         run: |
           cmake --version
 
+      - name: Cache FetchContent dependencies
+        uses: actions/cache@v4
+        with:
+          path: build/_deps
+          key: deps-${{ runner.os }}-${{ hashFiles('CMakeLists.txt') }}
+          restore-keys: |
+            deps-${{ runner.os }}-
+
       - name: Configure CMake
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DDATACONV_BUILD_TESTS=ON
 
