@@ -6,18 +6,26 @@ on:
 
 jobs:
   build-and-test:
-    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Setup build environment
+        run: |
+          cmake --version
+
       - name: Configure CMake
         run: cmake -S . -B build -DCMAKE_BUILD_TYPE=Release -DDATACONV_BUILD_TESTS=ON
 
-      - name: Build
+      - name: Build application
         run: cmake --build build --config Release --parallel
 
-      - name: Test
+      - name: Run tests
         working-directory: build
-        run: ctest --output-on-failure --no-tests=error
+        run: ctest --output-on-failure --no-tests=error -C Release
